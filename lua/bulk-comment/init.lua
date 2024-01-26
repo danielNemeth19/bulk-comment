@@ -1,3 +1,4 @@
+table.unpack = table.unpack or unpack
 local M = {}
 
 local commentMap = {
@@ -11,12 +12,13 @@ M.get_file_type = function ()
 	M['type'] = type
 	if commentMap[type] then
 		M['comment_string'] = commentMap[type]
-		print("type is ".. M["comment_string"])
 		local line = vim.api.nvim_get_current_line()
-		print("line is ".. line)
-		local pos = vim.fn.getpos('.')
-		local rn, col = pos[2], pos[3]
-		print("row ".. rn, "col: ".. col)
+		--print("line is ".. line)
+		--local rn, col = table.unpack(vim.api.nvim_win_get_cursor(0))
+		--print("row ".. rn, "col: ".. col)
+		--vim.api.nvim_put({"--"}, 'c', false, false)
+		local line_to_set = M["comment_string"] .. line
+		vim.api.nvim_set_current_line(line_to_set)
 	else
 		print("type is ".. type)
 	end
