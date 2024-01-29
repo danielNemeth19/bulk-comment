@@ -28,7 +28,8 @@ describe("commenter class", function ()
 	end)
 	it("can count whitespaces", function ()
 		local examples = {
-			{line = "example 1", result = 0 },
+			{ line = "", result = 0 },
+			{ line = "example 1", result = 0 },
 			{ line = " example 2", result = 1 },
 			{ line = "  example 3", result = 2 },
 			{ line = "   example 4", result = 3 }
@@ -38,7 +39,35 @@ describe("commenter class", function ()
 
 		for _, example in ipairs(examples) do
 			local res = c:count_whitespace(example.line)
-			assert.equals(res, example.result)
+			assert.equals(example.result, res)
 		end
 	end)
+	it("can determine if line is a code snippet", function ()
+		local Commenter = require("bulk-comment.commenter")
+		local c = Commenter:new('lua')
+		local non_empty = "function test()"
+		local verdict = c:is_empty_row(non_empty)
+		assert.equals(false, verdict)
+	end)
+	it("can determine if line is code snippet even if whitespace present", function ()
+		local Commenter = require("bulk-comment.commenter")
+		local c = Commenter:new('lua')
+		local non_empty = " function test()"
+		local verdict = c:is_empty_row(non_empty)
+		assert.equals(false, verdict)
+	end)
+	it("can determine if empty row when line is empty string", function ()
+		local Commenter = require("bulk-comment.commenter")
+		local c = Commenter:new('lua')
+		local empty = ""
+		local empty_verdict = c:is_empty_row(empty)
+		assert.equals(true, empty_verdict)
+	end)
+	it("can determine if empty row when line only has whitespaces", function ()
+		 local Commenter = require("bulk-comment.commenter")
+		 local c = Commenter:new('lua')
+		 local non_alphanumeric = "   "
+		 local non_alpha_verdict = c:is_empty_row(non_alphanumeric)
+		 assert.equals(true, non_alpha_verdict)
+	 end)
 end)

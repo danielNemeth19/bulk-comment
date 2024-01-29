@@ -32,12 +32,26 @@ function Commenter:count_whitespace(line)
 	return num_whitespace
 end
 
+---@param line string
+function Commenter:is_empty_row(line)
+	local any_whitespace = line:match("%S+")
+	if any_whitespace == nil then
+		return true
+	end
+	return false
+end
+
+
 -- TODO: don't toggle if no code under cursor
 -- implement actual toogle functionality
 function Commenter.toggle_comment(self)
 	local line = vim.api.nvim_get_current_line()
-	local num_whitespace = self:count_whitespace(line)
 	local row, _ = table.unpack(vim.api.nvim_win_get_cursor(0))
+	if self:is_empty_row(line) then
+		vim.api.nvim_win_set_cursor(0, {row + 1, 0})
+		return
+	end
+	local num_whitespace = self:count_whitespace(line)
 	vim.api.nvim_win_set_cursor(0, {row, num_whitespace})
 	vim.api.nvim_put({self.symbol}, 'c', false, false)
 	vim.api.nvim_win_set_cursor(0, {row + 1, num_whitespace})

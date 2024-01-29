@@ -15,5 +15,4 @@ M.get_file_type = function ()
 	end
 end
 
-
 return M
