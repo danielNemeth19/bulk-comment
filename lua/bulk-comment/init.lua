@@ -11,7 +11,7 @@ M.get_file_type = function ()
 		print("We'll have work to do")
 		commenter:toggle_comment()
 	else
-		print("Not yet supported: ".. filetype .. commenter.symbol)
+		print("Not yet supported: ".. filetype)
 	end
 end
 
