@@ -1,4 +1,4 @@
-table.unpack = table.unpack or unpack
+-- table.unpack = table.unpack or unpack
 local M = {}
 
 local Commenter = require("bulk-comment.commenter")

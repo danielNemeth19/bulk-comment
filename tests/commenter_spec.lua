@@ -1,3 +1,6 @@
+local mock = require("luassert.mock")
+local stub = require("luassert.stub")
+
 describe("commenter class", function ()
 	it("can require", function ()
 		require("bulk-comment.commenter")
@@ -88,5 +91,29 @@ describe("commenter class", function ()
 		 local non_alphanumeric = "   "
 		 local non_alpha_verdict = c:is_empty_row(non_alphanumeric)
 		 assert.equals(true, non_alpha_verdict)
-	 end)
+	end)
+	it("toggle returns nil for empty row", function ()
+		 local Commenter = require("bulk-comment.commenter")
+		 local c = Commenter:new('lua')
+
+		 local api = mock(vim.api, true)
+		 api.nvim_get_current_line.returns(" ")
+
+		 local mock_pos = stub(table, "unpack")
+		 mock_pos.returns(10)
+		 local result = c:toggle_comment()
+		 assert.equals(nil, result)
+	end)
+	it("toggle moves cursor next row for empty row", function ()
+		 local Commenter = require("bulk-comment.commenter")
+		 local c = Commenter:new('lua')
+
+		 local api = mock(vim.api, true)
+		 api.nvim_get_current_line.returns(" ")
+
+		 local mock_pos = stub(table, "unpack")
+		 mock_pos.returns(10)
+		 c:toggle_comment()
+		 assert.stub(api.nvim_win_set_cursor).was_called_with(0, {11, 0})
+	end)
 end)
