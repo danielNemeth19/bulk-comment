@@ -7,7 +7,6 @@ M.get_file_type = function ()
 	M['type'] = filetype
 	local commenter = Commenter:new(filetype)
 	if commenter.symbol then
-		print("We'll have work to do")
 		commenter:toggle_comment()
 	else
 		print("Not yet supported: ".. filetype)

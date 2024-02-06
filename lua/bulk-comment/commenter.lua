@@ -68,7 +68,7 @@ function Commenter:_toggle_block_style(line, row, num_whitespace)
 	vim.api.nvim_put({self.symbol[1]}, 'c', false, false)
 end
 
--- implement actual toogle functionality
+-- TODO: implement actual toogle functionality
 function Commenter:toggle_comment()
 	local line = vim.api.nvim_get_current_line()
 	local row, _ = table.unpack(vim.api.nvim_win_get_cursor(0))
