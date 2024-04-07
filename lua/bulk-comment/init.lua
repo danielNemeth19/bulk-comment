@@ -2,7 +2,7 @@ local M = {}
 
 local Commenter = require("bulk-comment.commenter")
 
-M.get_file_type = function ()
+M.toggle = function ()
 	local filetype = vim.bo.filetype
 	M['type'] = filetype
 	local commenter = Commenter:new(filetype)

@@ -73,9 +73,18 @@ function Commenter:_toggle_block_style(line, row, num_whitespace)
 	vim.api.nvim_put({self.symbol[1]}, 'c', false, false)
 end
 
+---@param line string
+function Commenter:is_commented(line)
+    print(self.symbol .. line)
+end
+
 -- TODO: implement actual toogle functionality
 function Commenter:toggle_comment()
 	local line = vim.api.nvim_get_current_line()
+
+    -- TODO implement functionality
+    self:is_commented(line)
+
 	local row, _ = table.unpack(vim.api.nvim_win_get_cursor(0))
 	if self:is_empty_row(line) then
 		vim.api.nvim_win_set_cursor(0, {row + 1, 0})
@@ -89,7 +98,10 @@ function Commenter:toggle_comment()
 		self:_toggle_block_style(line, row, num_whitespace)
 	end
 
-	vim.api.nvim_win_set_cursor(0, {row + 1, num_whitespace})
+	local total_row_num = vim.api.nvim_buf_line_count(0)
+	if row ~= total_row_num then
+		vim.api.nvim_win_set_cursor(0, {row + 1, num_whitespace})
+	end
 end
 
 return Commenter
