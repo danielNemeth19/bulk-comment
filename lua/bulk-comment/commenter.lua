@@ -83,7 +83,7 @@ function Commenter:toggle_comment()
 	local line = vim.api.nvim_get_current_line()
 
     -- TODO implement functionality
-    self:is_commented(line)
+    -- self:is_commented(line)
 
 	local row, _ = table.unpack(vim.api.nvim_win_get_cursor(0))
 	if self:is_empty_row(line) then
