@@ -141,4 +141,12 @@ describe("commenter class", function ()
 		assert.stub(API_MOCK.nvim_put).was_called_with({"/* "}, 'c', false, false)
 		assert.stub(API_MOCK.nvim_put).was.called(2)
 	end)
+    it("is commented test", function ()
+        local c = Commenter:new('go')
+        local line = "// func myFunc(x, y int) bool {"
+
+        local verdict = c:is_commented(line)
+        print("result is:")
+        print(verdict)
+    end)
 end)
