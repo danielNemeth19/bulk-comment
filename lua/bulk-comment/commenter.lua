@@ -7,6 +7,8 @@ local commentMap = {
     go = "// ",
     javascript = "// ",
     typescript = "// ",
+    sh = "# ",
+    fish = "# ",
     css = {
         "/* ",
         " */"
@@ -74,16 +76,36 @@ function Commenter:_toggle_block_style(line, row, num_whitespace)
 end
 
 ---@param line string
-function Commenter:is_commented(line)
+---@param num_whitespace integer
+function Commenter:is_commented(line, num_whitespace)
+    local symbol
     if type(self.symbol) == "string" then
-        local num_chars = self.symbol:len()
+        symbol = self.symbol
     else
-        local num_chars = self.symbol[1]:len()
+        symbol = self.symbol[1]
     end
-    if line.sub(line, 1, num_chars) == self.symbol then
+    if line:sub(num_whitespace + 1, num_whitespace + symbol:len()) == symbol then
         return true
     end
     return false
+end
+
+---@param row number
+---@param num_whitespace number
+function Commenter:remove_inline_style(row, num_whitespace)
+    -- since nvim_buf_set_text is 0 indexed for row too
+    -- row needs to be modified
+    local start_row, end_row = row - 1 , row - 1
+    local start_col = num_whitespace
+    local end_col = num_whitespace + self.symbol:len()
+    vim.api.nvim_buf_set_text(0, start_row, start_col, end_row, end_col, {""} )
+end
+
+function Commenter:remove_block_style(line, row, num_whitespace)
+    local start_pos = num_whitespace + self.symbol[1]:len() + 1
+    local end_pos = 0 - self.symbol[2]:len() - 1
+    local new_line = line:sub(start_pos, end_pos)
+    vim.api.nvim_buf_set_lines(0, row-1, row, true, { "  " .. new_line })
 end
 
 -- TODO: implement actual toogle functionality
@@ -96,22 +118,23 @@ function Commenter:toggle_comment()
         return
     end
 
-    if not self:is_commented(line) then
-        local num_whitespace = self:count_whitespace(line)
+    local num_whitespace = self:count_whitespace(line)
+    if not self:is_commented(line, num_whitespace) then
         if type(self.symbol) == "string" then
             self:_toggle_inline_style(row, num_whitespace)
         else
             self:_toggle_block_style(line, row, num_whitespace)
         end
-
-        local total_row_num = vim.api.nvim_buf_line_count(0)
-        if row ~= total_row_num then
-            vim.api.nvim_win_set_cursor(0, { row + 1, num_whitespace })
-        end
     else
-        print("already commented line")
-        -- doesn't work...
-        vim.api.nvim_buf_set_lines(0, 1, self.symbol:len(), false, {})
+        if type(self.symbol) == "string" then
+            self:remove_inline_style(row, num_whitespace)
+        else
+            self:remove_block_style(line, row, num_whitespace)
+        end
+    end
+    local total_row_num = vim.api.nvim_buf_line_count(0)
+    if row ~= total_row_num then
+        vim.api.nvim_win_set_cursor(0, { row + 1, num_whitespace })
     end
 end
 

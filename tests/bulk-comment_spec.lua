@@ -7,7 +7,7 @@ local function buffer_setup(input, filetype)
     vim.api.nvim_buf_set_lines(0, 0, -1, true, vim.split(input, '\n'))
 end
 
-local function comment_line(line)
+local function toggle_line(line)
     vim.api.nvim_win_set_cursor(0, { line, 0 })
     local keypress = vim.api.nvim_replace_termcodes('bc', true, false, true)
     vim.api.nvim_feedkeys(keypress, "x", false)
@@ -32,7 +32,7 @@ describe("bulk-comment", function()
         local expected_output = { "# sys.exit(3)" }
 
         buffer_setup(input, "python")
-        comment_line(1)
+        toggle_line(1)
         local buffer_content = get_lines_from_buffer()
         assert.are.same(expected_output, buffer_content)
     end)
@@ -46,8 +46,40 @@ describe("bulk-comment", function()
             print(param)
         -- end]]
         buffer_setup(input, "lua")
-        comment_line(3)
+        toggle_line(3)
         local buffer_content = get_lines_from_buffer()
         assert.are.same(vim.split(expected_output, "\n"), buffer_content)
+    end)
+    it("uncommenting single row", function()
+        local input = "// function myTest() int {"
+        local expected_output = { "function myTest() int {" }
+        buffer_setup(input, "go")
+        toggle_line(1)
+        local buffer_content = get_lines_from_buffer()
+        assert.are.same(expected_output, buffer_content)
+    end)
+    it("uncommenting single row - with whitespace", function()
+        local input = "  // myVal := 5"
+        local expected_output = { "  myVal := 5" }
+        buffer_setup(input, "go")
+        toggle_line(1)
+        local buffer_content = get_lines_from_buffer()
+        assert.are.same(expected_output, buffer_content)
+    end)
+    it("uncommenting block style", function ()
+        local input = "/* .navbar { */"
+        local expected_output = { ".navbar {" }
+        buffer_setup(input, "css")
+        toggle_line(1)
+        local buffer_content = get_lines_from_buffer()
+        assert.are.same(expected_output, buffer_content)
+    end)
+    it("uncommenting block style - with whitespace", function ()
+        local input = "  /* .navbar { */"
+        local expected_output = { "  .navbar {" }
+        buffer_setup(input, "css")
+        toggle_line(1)
+        local buffer_content = get_lines_from_buffer()
+        assert.are.same(expected_output, buffer_content)
     end)
 end)
