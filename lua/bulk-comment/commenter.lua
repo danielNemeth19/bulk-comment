@@ -95,17 +95,24 @@ end
 function Commenter:remove_inline_style(row, num_whitespace)
     -- since nvim_buf_set_text is 0 indexed for row too
     -- row needs to be modified
-    local start_row, end_row = row - 1 , row - 1
+    -- start_row and end_row is the same as we edit in place
+    local start_row, end_row = row - 1, row - 1
     local start_col = num_whitespace
     local end_col = num_whitespace + self.symbol:len()
-    vim.api.nvim_buf_set_text(0, start_row, start_col, end_row, end_col, {""} )
+    vim.api.nvim_buf_set_text(0, start_row, start_col, end_row, end_col, { "" })
 end
 
 function Commenter:remove_block_style(line, row, num_whitespace)
     local start_pos = num_whitespace + self.symbol[1]:len() + 1
     local end_pos = 0 - self.symbol[2]:len() - 1
     local new_line = line:sub(start_pos, end_pos)
-    vim.api.nvim_buf_set_lines(0, row-1, row, true, { "  " .. new_line })
+    local ws = ""
+    local counter = 0
+    while counter < num_whitespace do
+        ws = ws .. " "
+        counter = counter + 1
+    end
+    vim.api.nvim_buf_set_lines(0, row - 1, row, true, { ws .. new_line })
 end
 
 -- TODO: implement actual toogle functionality

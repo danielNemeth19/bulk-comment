@@ -75,8 +75,8 @@ describe("bulk-comment", function()
         assert.are.same(expected_output, buffer_content)
     end)
     it("uncommenting block style - with whitespace", function ()
-        local input = "  /* .navbar { */"
-        local expected_output = { "  .navbar {" }
+        local input = "  /* margin-left: auto; */"
+        local expected_output = { "  margin-left: auto;" }
         buffer_setup(input, "css")
         toggle_line(1)
         local buffer_content = get_lines_from_buffer()
