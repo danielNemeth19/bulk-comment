@@ -151,7 +151,7 @@ describe("commenter class", function()
         local verdict = c:is_commented(line, 0)
         assert.equals(false, verdict)
     end)
-    it("can toggle inline style comment", function()
+    it("can add inline style comment", function()
         local c = Commenter:new('python')
 
         API_MOCK.nvim_get_current_line.returns("class MyClass:")
@@ -162,7 +162,18 @@ describe("commenter class", function()
         assert.stub(API_MOCK.nvim_win_set_cursor).was_called_with(0, { 3, 0 })
         assert.stub(API_MOCK.nvim_win_set_cursor).was.called(2)
     end)
-    it("can toggle block style comment", function()
+    it("can add inline style comment - whitespace", function ()
+        local c = Commenter:new('lua')
+        
+        API_MOCK.nvim_get_current_line.returns("  if type(self.symbol) == 'string' then")
+        API_MOCK.nvim_win_get_cursor.returns({ 2, 2 })
+        c:toggle_comment()
+        assert.stub(API_MOCK.nvim_win_set_cursor).was_called_with(0, { 2, 2 })
+        assert.stub(API_MOCK.nvim_put).was_called_with({ "-- " }, 'c', false, false)
+        assert.stub(API_MOCK.nvim_win_set_cursor).was_called_with(0, { 3, 2 })
+        assert.stub(API_MOCK.nvim_win_set_cursor).was.called(2)
+    end)
+    it("can add block style comment", function()
         local c = Commenter:new('css')
         local line = ".myclass {"
 
@@ -175,6 +186,27 @@ describe("commenter class", function()
         assert.stub(API_MOCK.nvim_put).was_called_with({ "/* " }, 'c', false, false)
         assert.stub(API_MOCK.nvim_put).was.called(2)
     end)
+    it("can add block style comment - whitespace", function ()
+        local c = Commenter:new('css')
+        local line = "  margin-left: auto;"
+
+        API_MOCK.nvim_get_current_line.returns(line)
+        API_MOCK.nvim_win_get_cursor.returns({ 10, 2 })
+        c:toggle_comment()
+
+        -- vim.api.nvim_win_set_cursor(0, { row, endpos })
+        -- vim.api.nvim_put({ self.symbol[2] }, 'c', true, false)
+
+        -- vim.api.nvim_win_set_cursor(0, { row, num_whitespace })
+        -- vim.api.nvim_put({ self.symbol[1] }, 'c', false, false)
+        assert.stub(API_MOCK.nvim_win_set_cursor).was_called_with(0, { 10, line:len() })
+        -- assert.stub(API_MOCK.nvim_put).was_called_with({ " */" }, 'c', false, false)
+        -- assert.stub(API_MOCK.nvim_win_set_cursor).was_called_with(0, { 11, 2 })
+        -- assert.stub(API_MOCK.nvim_put).was_called_with({ "/* " }, 'c', false, false)
+    end)
+    
+
+
     it("can uncomment inline style comment", function()
         local c = Commenter:new('python')
 

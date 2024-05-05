@@ -50,6 +50,38 @@ describe("bulk-comment", function()
         local buffer_content = get_lines_from_buffer()
         assert.are.same(vim.split(expected_output, "\n"), buffer_content)
     end)
+    it("commenting single row", function()
+        local input = "function myTest() int {"
+        local expected_output = { "// function myTest() int {" }
+        buffer_setup(input, "go")
+        toggle_line(1)
+        local buffer_content = get_lines_from_buffer()
+        assert.are.same(expected_output, buffer_content)
+    end)
+    it("commenting single row - with whitespace", function()
+        local input = "  local my_var = 6"
+        local expected_output = { "  -- local my_var = 6" }
+        buffer_setup(input, "lua")
+        toggle_line(1)
+        local buffer_content = get_lines_from_buffer()
+        assert.are.same(expected_output, buffer_content)
+    end)
+    it("commenting block style", function ()
+        local input = ".navbar {"
+        local expected_output = { "/* .navbar { */" }
+        buffer_setup(input, "css")
+        toggle_line(1)
+        local buffer_content = get_lines_from_buffer()
+        assert.are.same(expected_output, buffer_content)
+    end)
+    it("commenting block style - with whitespace", function ()
+        local input = "  margin-left: auto;"
+        local expected_output = { "  /* margin-left: auto; */" }
+        buffer_setup(input, "css")
+        toggle_line(1)
+        local buffer_content = get_lines_from_buffer()
+        assert.are.same(expected_output, buffer_content)
+    end)
     it("uncommenting single row", function()
         local input = "// function myTest() int {"
         local expected_output = { "function myTest() int {" }
