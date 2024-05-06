@@ -69,7 +69,6 @@ end
 function Commenter:_toggle_block_style(line, row, num_whitespace)
     local endpos = line:len()
     vim.api.nvim_win_set_cursor(0, { row, endpos })
-    print("symbol is" .. self.symbol[2])
     vim.api.nvim_put({ self.symbol[2] }, 'c', true, false)
 
     vim.api.nvim_win_set_cursor(0, { row, num_whitespace })
@@ -132,7 +131,6 @@ function Commenter:toggle_comment()
         if type(self.symbol) == "string" then
             self:_toggle_inline_style(row, num_whitespace)
         else
-            print("IS THIS CALLED?")
             self:_toggle_block_style(line, row, num_whitespace)
         end
     else
