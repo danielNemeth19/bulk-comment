@@ -56,25 +56,6 @@ function Commenter:is_empty_row(line)
     return false
 end
 
----@param row integer
----@param num_whitespace integer
-function Commenter:_toggle_inline_style(row, num_whitespace)
-    vim.api.nvim_win_set_cursor(0, { row, num_whitespace })
-    vim.api.nvim_put({ self.symbol }, 'c', false, false)
-end
-
----@param line string
----@param row integer
----@param num_whitespace integer
-function Commenter:_toggle_block_style(line, row, num_whitespace)
-    local endpos = line:len()
-    vim.api.nvim_win_set_cursor(0, { row, endpos })
-    vim.api.nvim_put({ self.symbol[2] }, 'c', true, false)
-
-    vim.api.nvim_win_set_cursor(0, { row, num_whitespace })
-    vim.api.nvim_put({ self.symbol[1] }, 'c', false, false)
-end
-
 ---@param line string
 ---@param num_whitespace integer
 function Commenter:is_commented(line, num_whitespace)
@@ -90,9 +71,26 @@ function Commenter:is_commented(line, num_whitespace)
     return false
 end
 
+---@param line string
+---@param row integer
+---@param num_whitespace integer
+function Commenter:add_comment(line, row, num_whitespace)
+    if type(self.symbol) == "string" then
+        vim.api.nvim_win_set_cursor(0, { row, num_whitespace })
+        vim.api.nvim_put({ self.symbol }, 'c', false, false)
+    else
+        local endpos = line:len()
+        vim.api.nvim_win_set_cursor(0, { row, endpos })
+        vim.api.nvim_put({ self.symbol[2] }, 'c', true, false)
+
+        vim.api.nvim_win_set_cursor(0, { row, num_whitespace })
+        vim.api.nvim_put({ self.symbol[1] }, 'c', false, false)
+    end
+end
+
 ---@param row number
 ---@param num_whitespace number
-function Commenter:remove_inline_style(row, num_whitespace)
+function Commenter:remove_inline_comment(row, num_whitespace)
     -- since nvim_buf_set_text is 0 indexed for row too
     -- row needs to be modified
     -- start_row and end_row is the same as we edit in place
@@ -102,7 +100,7 @@ function Commenter:remove_inline_style(row, num_whitespace)
     vim.api.nvim_buf_set_text(0, start_row, start_col, end_row, end_col, { "" })
 end
 
-function Commenter:remove_block_style(line, row, num_whitespace)
+function Commenter:remove_block_comment(line, row, num_whitespace)
     local start_pos = num_whitespace + self.symbol[1]:len() + 1
     local end_pos = 0 - self.symbol[2]:len() - 1
     local new_line = line:sub(start_pos, end_pos)
@@ -124,20 +122,14 @@ function Commenter:toggle_comment()
         return
     end
 
-    -- TODO: think about using actual col information
-    -- instead of whitespace
     local num_whitespace = self:count_whitespace(line)
     if not self:is_commented(line, num_whitespace) then
-        if type(self.symbol) == "string" then
-            self:_toggle_inline_style(row, num_whitespace)
-        else
-            self:_toggle_block_style(line, row, num_whitespace)
-        end
+        self:add_comment(line, row, num_whitespace)
     else
         if type(self.symbol) == "string" then
-            self:remove_inline_style(row, num_whitespace)
+            self:remove_inline_comment(row, num_whitespace)
         else
-            self:remove_block_style(line, row, num_whitespace)
+            self:remove_block_comment(line, row, num_whitespace)
         end
     end
     local total_row_num = vim.api.nvim_buf_line_count(0)
