@@ -88,6 +88,18 @@ function Commenter:add_comment(line, row, num_whitespace)
     end
 end
 
+
+---@param line string
+---@param row integer
+---@param num_whitespace integer
+function Commenter:remove_comment(line, row, num_whitespace)
+    if type(self.symbol) == "string" then
+       self:remove_inline_comment(row, num_whitespace)
+    else
+        self:remove_block_comment(line, row, num_whitespace)
+    end
+end
+
 ---@param row number
 ---@param num_whitespace number
 function Commenter:remove_inline_comment(row, num_whitespace)
@@ -126,11 +138,7 @@ function Commenter:toggle_comment()
     if not self:is_commented(line, num_whitespace) then
         self:add_comment(line, row, num_whitespace)
     else
-        if type(self.symbol) == "string" then
-            self:remove_inline_comment(row, num_whitespace)
-        else
-            self:remove_block_comment(line, row, num_whitespace)
-        end
+        self:remove_comment(line, row, num_whitespace)
     end
     local total_row_num = vim.api.nvim_buf_line_count(0)
     if row ~= total_row_num then

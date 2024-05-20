@@ -164,7 +164,7 @@ describe("commenter class", function()
     end)
     it("can add inline style comment - whitespace", function ()
         local c = Commenter:new('lua')
-        
+
         API_MOCK.nvim_get_current_line.returns("  if type(self.symbol) == 'string' then")
         API_MOCK.nvim_win_get_cursor.returns({ 2, 2 })
         c:toggle_comment()
