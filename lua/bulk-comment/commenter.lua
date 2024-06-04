@@ -9,6 +9,8 @@ local commentMap = {
     typescript = "// ",
     sh = "# ",
     fish = "# ",
+    ps1 = "# ",
+    dockerfile = "# ",
     css = {
         "/* ",
         " */"
