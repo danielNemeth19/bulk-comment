@@ -18,6 +18,10 @@ local commentMap = {
     html = {
         "<!--",
         "-->"
+    },
+    htmldjango = {
+        "<!--",
+        "-->"
     }
 }
 
